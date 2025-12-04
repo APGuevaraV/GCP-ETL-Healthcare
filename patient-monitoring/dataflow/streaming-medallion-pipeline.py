@@ -27,11 +27,14 @@ pipeline_options = PipelineOptions(
 pipeline_options.view_as(StandardOptions).streaming = True
 
 # ------------------- Helper Functions -------------------
+
+
 def parse_json(message):
     try:
         return json.loads(message)
     except:
         return None
+
 
 def is_valid_record(record):
     try:
@@ -60,6 +63,7 @@ def is_valid_record(record):
     except Exception:
         return False
 
+
 def enrich_record(record):
     record["risk_score"] = (
         (record["heart_rate"]/200)*0.4 +
@@ -74,6 +78,7 @@ def enrich_record(record):
         record["risk_level"] = "High"
     return record
 
+
 # ------------------- Pipeline -------------------
 with beam.Pipeline(options=pipeline_options) as p:
 
@@ -82,7 +87,8 @@ with beam.Pipeline(options=pipeline_options) as p:
         p
         | "Read from PubSub" >> beam.io.ReadFromPubSub(subscription=PUBSUB_SUBSCRIPTION)
         | "Decode to string" >> beam.Map(lambda x: x.decode("utf-8"))
-        | "Window Bronze Data" >> beam.WindowInto(FixedWindows(60))  # 1-minute windows
+        # 1-minute windows
+        | "Window Bronze Data" >> beam.WindowInto(FixedWindows(60))
     )
 
     # Write raw messages to Bronze GCS
@@ -140,14 +146,14 @@ with beam.Pipeline(options=pipeline_options) as p:
 
     # Write Gold to BigQuery
     TABLE_SCHEMA = {
-    "fields": [
-        {"name": "patient_id", "type": "STRING", "mode": "REQUIRED"},
-        {"name": "avg_heart_rate", "type": "FLOAT", "mode": "NULLABLE"},
-        {"name": "avg_spo2", "type": "FLOAT", "mode": "NULLABLE"},
-        {"name": "avg_temperature", "type": "FLOAT", "mode": "NULLABLE"},
-        {"name": "max_risk_level", "type": "STRING", "mode": "NULLABLE"}
-    ]
-}
+        "fields": [
+            {"name": "patient_id", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "avg_heart_rate", "type": "FLOAT", "mode": "NULLABLE"},
+            {"name": "avg_spo2", "type": "FLOAT", "mode": "NULLABLE"},
+            {"name": "avg_temperature", "type": "FLOAT", "mode": "NULLABLE"},
+            {"name": "max_risk_level", "type": "STRING", "mode": "NULLABLE"}
+        ]}
+
     gold_data | "Write Gold to BigQuery" >> beam.io.WriteToBigQuery(
         BIGQUERY_TABLE,
         schema=TABLE_SCHEMA,

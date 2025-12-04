@@ -22,6 +22,7 @@ topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 # Generate list of patient IDs
 patient_ids = [f"P{i:03d}" for i in range(1, PATIENT_COUNT + 1)]
 
+
 def generate_vitals():
     """Generate one patient vital record with a chance to inject errors."""
     record = {
@@ -36,7 +37,8 @@ def generate_vitals():
 
     # Inject errors based on ERROR_RATE
     if random.random() < ERROR_RATE:
-        error_type = random.choice(["missing_field", "negative_value", "out_of_range"])
+        error_type = random.choice(
+            ["missing_field", "negative_value", "out_of_range"])
         if error_type == "missing_field":
             # remove a random field
             field_to_remove = random.choice(list(record.keys()))
@@ -47,7 +49,8 @@ def generate_vitals():
             record["spo2"] = 150  # invalid SpO2
     return record
 
-print("Starting patient vitals simulator with error injection... Press Ctrl+C to stop.")
+
+print("Starting patient vitals simulator with error injection...")
 
 while True:
     vitals = generate_vitals()
