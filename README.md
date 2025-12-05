@@ -1,11 +1,11 @@
-# 🏥 Real-Time Patient Vital Signs ETL Pipeline (GCP)
+#  Real-Time Patient Vital Signs ETL Pipeline (GCP)
 
 Este proyecto implementa un pipeline ETL en streaming para el monitoreo en tiempo real de signos vitales de pacientes. Utiliza Google Cloud Platform (GCP) con una arquitectura basada en Pub/Sub, Dataflow (Apache Beam), Cloud Storage, BigQuery y Power BI.
 El flujo sigue un enfoque Bronze → Silver → Gold, permitiendo manejar datos crudos, limpios, enriquecidos y finalmente analíticos para dashboards en tiempo real.
 
 ---
 
-## 📌 Arquitectura General
+##  Arquitectura General
 
 ![Architecture](docs/GCP-architecture.jpg)
 
@@ -15,7 +15,7 @@ Este proyecto implementa un pipeline de procesamiento en tiempo real para monito
 
 ---
 
-## 📌 Arquitectura General
+##  Arquitectura General
 
 ### **Descripción del flujo**
 
@@ -43,7 +43,7 @@ Pipeline que:
 
 ---
 
-## 🧪 1. Simulador de Signos Vitales (Python)
+##  1. Simulador de Signos Vitales (Python)
 
 El proyecto incluye un simulador que genera y publica registros hacia Pub/Sub en formato JSON.
 
@@ -56,3 +56,30 @@ El proyecto incluye un simulador que genera y publica registros hacia Pub/Sub en
   - SpO₂ fuera de rango
 - Envía mensajes a un topic Pub/Sub.
 
+##  2. Pipeline de Procesamiento (Apache Beam + Dataflow)
+
+El core del proyecto es el pipeline ETL desarrollado en Apache Beam.
+
+### Bronze Layer
+- Lee mensajes crudos desde Pub/Sub.  
+- Aplica ventanas de 60 segundos.  
+- Escribe los archivos en Cloud Storage sin transformación.
+
+---
+
+### Silver Layer
+- Parseo de JSON.  
+- Validación de campos y rangos.  
+- Cálculo de riesgo inicial por paciente.  
+- Escritura en Cloud Storage como data limpia/enriquecida.
+
+---
+
+### Gold Layer
+- Agrupación por `patient_id`.  
+- Cálculo de métricas:  
+  - BPM promedio  
+  - SpO₂ promedio  
+  - Temperatura promedio  
+  - Máximo nivel de riesgo  
+- Carga a BigQuery con `WriteToBigQuery`.
