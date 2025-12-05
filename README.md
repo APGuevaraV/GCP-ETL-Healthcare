@@ -83,3 +83,16 @@ El core del proyecto es el pipeline ETL desarrollado en Apache Beam.
   - Temperatura promedio  
   - Máximo nivel de riesgo  
 - Carga a BigQuery con `WriteToBigQuery`.
+
+## 3. Dashboard en Power BI
+
+### Incluye:
+- Estado actual del paciente  
+- Nivel de riesgo (Low, Moderate, High)  
+- Tendencias de signos vitales  
+- Indicadores por ventana  
+- Alertas basadas en modelos del pipeline  
+
+Power BI permite refresco casi en tiempo real conectándose directamente a **BigQuery**.
+
+![Architecture](docs/dashboard_healthcare.jpg)
